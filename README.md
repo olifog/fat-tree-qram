@@ -1,23 +1,31 @@
 # Fat-tree QRAM
 
-https://arxiv.org/pdf/2502.06767
+Implementation of quantum RAM architectures based on [arXiv:2502.06767](https://arxiv.org/pdf/2502.06767)
 
 ## Usage
 
+### Run BB QRAM Demo
+
 ```bash
-uv run fat-tree
 uv run bb
 ```
 
-## Commands
+This demonstrates an 8-address QRAM querying multiple addresses with 100% accuracy.
 
-Formatting/linting:
+### Run Tests
+
+```bash
+uv run pytest tests/ -v
+```
+
+### Linting
 
 ```bash
 uv run ruff check
 ```
 
-Typecheck:
+### Type Checking
+
 ```bash
 uv run mypy src
 ```
