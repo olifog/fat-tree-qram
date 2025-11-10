@@ -8,11 +8,20 @@ authors = [
     { name = "Newsh123" }
 ]
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "qiskit>=2.2.3",
+]
 
 [project.scripts]
-fat-tree-qram = "fat_tree_qram:main"
+fat-tree = "fat_tree_qram:main"
+bb = "bb_qram:main"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.18.2",
+    "ruff>=0.14.4",
+]
