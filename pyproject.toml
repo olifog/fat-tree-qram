@@ -1,0 +1,18 @@
+[project]
+name = "fat-tree-qram"
+version = "0.1.0"
+description = "Fat-tree QRAM implementation"
+readme = "README.md"
+authors = [
+    { name = "olifog", email = "oliverfogelin@gmail.com" },
+    { name = "Newsh123" }
+]
+requires-python = ">=3.12"
+dependencies = []
+
+[project.scripts]
+fat-tree-qram = "fat_tree_qram:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
