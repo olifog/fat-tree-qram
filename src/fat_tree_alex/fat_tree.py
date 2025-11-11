@@ -1,5 +1,6 @@
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 import math
+from collections import deque
 
 def create_qram(qram_size : int):
     addr_length = int(math.ceil(math.log(qram_size, 2)))
@@ -8,7 +9,8 @@ def create_qram(qram_size : int):
     # nodes doubles for each level
     num_routers = sum([(addr_length - i) * (2**i) for i in range(0, addr_length)])
 
-    addr_bus = QuantumRegister(addr_length, name='addr')
+    addr_in_bus = QuantumRegister(addr_length, name='addr_in')
+    addr_out_bus = QuantumRegister(addr_length, name='addr_out')
     data_bus = QuantumRegister(1, name='data')
     router_input = QuantumRegister(num_routers, name='input')
     router_route_qubit = QuantumRegister(num_routers, name='route')
@@ -18,7 +20,8 @@ def create_qram(qram_size : int):
     store = ClassicalRegister(qram_size, 'store')
 
     qc = QuantumCircuit(
-        addr_bus,
+        addr_in_bus,
+        addr_out_bus,
         data_bus,
         router_input,
         router_route_qubit,
@@ -28,7 +31,7 @@ def create_qram(qram_size : int):
         name='qram'
     )
 
-    return qc, addr_bus, data_bus, router_input, router_route_qubit, router_left, router_right, store
+    return qc, addr_in_bus, addr_out_bus, data_bus, router_input, router_route_qubit, router_left, router_right, store
 
 
 def init_addr(qc : QuantumCircuit, addr : QuantumRegister):
@@ -56,9 +59,14 @@ def route(qc, input, route_qubit, left, right):
 def transport(qc, router_a_output, router_b_input):
     qc.swap(router_a_output, router_b_input)
 
-def classic_gates(qc, output_bit, store_val):
-    qc.reset(output_bit)
-    qc.x(output_bit).c_if(store_val, 1)
+def classic_gates(num_levels, qc, router_left, router_right, store_val):
+    start_index = sum([2**(j+1) - 1 for j in range(0, num_levels)])
+    offset = 2**(num_levels-1)
+    for i in range(0, offset):
+        qc.reset(router_left[start_index - offset + i])
+        qc.x(router_left[start_index - offset + i]).c_if(store_val[2*i], 1)
+        qc.reset(router_right[start_index - offset + i])
+        qc.x(router_right[start_index - offset + i]).c_if(store_val[2*i], 1)
 
 def load_layer(num_levels, queries, qc, addr, data_bus, router_input, router_route_qubit, router_left, router_right):
     qc.barrier()
@@ -197,14 +205,39 @@ def swap_ii(num_levels, qc, router_input, router_route_qubit, router_left, route
             qc.swap(router_right[j], router_right[j+tree_size])
 
 
+def schedule_queries(num_levels, queries, *qc_tuple):
+    qc, addr_in_bus, addr_out_bus, data_bus, router_input, router_route_qubit, router_left, router_right, qram_data = qc_tuple
+    current_queries = []
+    t = 1
+    while current_queries or queries:
+        if t % 2 == 1:
+            next_query = queries.pop_front()
+            # TODO
+            load_queries = [query for query in current_queries if query['load']]
+            unload_queries = [query for query in current_queries if not query['load']]
+            load_layer(num_levels, load_queries, qc, addr_in_bus, data_bus, router_input, router_route_qubit, router_left, router_right)
+            unload_layer(num_levels, unload_queries, qc, addr_out_bus, data_bus, router_input, router_route_qubit, router_left, router_right)
+
+        else:
+            if t % 4 == 2:
+                swap_i(num_levels, qc, router_input, router_route_qubit, router_left, router_right)
+                if num_levels % 2 == 1:
+                    classic_gates(num_levels, qc, router_left, router_right, qram_data)
+
+            else:
+                swap_ii(num_levels, qc, router_input, router_route_qubit, router_left, router_right)
+                if num_levels % 2 == 0:
+                    classic_gates(num_levels, qc, router_left, router_right, qram_data)
+
+
+
+
+
+
 if __name__ == "__main__":
     num_levels = 4
-    qc, addr, data_bus, router_input, router_route_qubit, router_left, router_right, qram_data = create_qram(2**num_levels)
-    init_addr(qc, addr)
-    new_queries = load_layer(num_levels, [{'loaded': 0, 'k': 0, 's': 0}], qc, addr, data_bus, router_input, router_route_qubit, router_left, router_right)
-    swap_i(num_levels, qc, router_input, router_route_qubit, router_left, router_right)
-    # new_queries[0]['k'] += 1
-    unload_layer(num_levels, new_queries, qc, addr, data_bus, router_input, router_route_qubit, router_left, router_right)
-    print(qc.draw())
+    qc_tuple = create_qram(2**num_levels)
+    schedule_queries(num_levels, deque(), *qc_tuple)
+    print(qc_tuple[0].draw())
 
 
