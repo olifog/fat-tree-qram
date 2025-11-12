@@ -47,7 +47,7 @@ def load(qc: QuantumCircuit, input: Qubit, addr_or_data: Qubit) -> None:
 def store(qc: QuantumCircuit, input: Qubit, route_qubit: Qubit) -> None:
     qc.swap(input, route_qubit)
 
-def route(qc: QuantumCircuit, input: Qubit, route_qubit: Qubit, left: Qubit, right: Qubit) -> None:
+def route(qc: QuantumCircuit, route_qubit: Qubit, input: Qubit, left: Qubit, right: Qubit) -> None:
     qc.cswap(route_qubit, input, right)
     qc.x(route_qubit)
     qc.cswap(route_qubit, input, left)
@@ -194,7 +194,7 @@ def unload_layer(num_levels: int, queries: list[dict[str, Any]], qc: QuantumCirc
 
 
 def swap_i(num_levels: int, qc: QuantumCircuit, registers: dict[str, Register]) -> None:
-    for i in range(0, num_levels, 2):
+    for i in range(0, num_levels - 1, 2):
         tree_size = 2**(i+1) - 1
         start_index = sum([2**(j+1) - 1 for j in range(0, i)])
         for j in range(start_index, start_index + tree_size):
@@ -275,31 +275,31 @@ def schedule_queries(num_levels: int, queries: deque[list[int]], qc: QuantumCirc
 
 if __name__ == "__main__":
     num_levels = 4
-    num_queries = 4
+    num_queries = 1
     qc, registers = create_qram(2**num_levels, num_queries)
 
     queue = deque()
-    queue.append([1,2,2,0])
+    queue.append([1,1,0,0])
     # queue.append([1,2,2,0])
     # queue.append([1,2,2,0])
     # queue.append([1,2,2,0])
 
-    data_bits = [0,0,1,1,0,1,1,0,1,1,1,1,0,0,0,1]
+    data_bits = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
 
     schedule_queries(num_levels, queue, qc, registers, data_bits)
 
     print(qc.draw())
 
-    # service = QiskitRuntimeService()
-    # backend = service.least_busy(simulator=False, operational=True)
-    # pm = generate_preset_pass_manager(backend=backend, optimization_level=1)
-    # isa_circuit = pm.run(qc)
-    #
-    # sampler = Sampler(mode=backend)
-    # job = sampler.run([isa_circuit], shots = 1024)
-    #
-    # primitive_result = job.result()
-    # pub_result = primitive_result[0]
-    # print(pub_result.data.results.get_counts())
+    service = QiskitRuntimeService()
+    backend = service.least_busy(simulator=False, operational=True)
+    pm = generate_preset_pass_manager(backend=backend, optimization_level=1)
+    isa_circuit = pm.run(qc)
+
+    sampler = Sampler(mode=backend)
+    job = sampler.run([isa_circuit], shots = 1024)
+
+    primitive_result = job.result()
+    pub_result = primitive_result[0]
+    print(pub_result.data.results.get_counts())
 
 
