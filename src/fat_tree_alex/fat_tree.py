@@ -61,10 +61,10 @@ def classic_gates(num_levels: int, qc: QuantumCircuit, router_left: QuantumRegis
     offset = 2**(num_levels-1)
     for i in range(0, offset):
         qc.reset(router_left[start_index - offset + i])
-        with qc.if_test((store_val[2*i], 1)):
+        if store_val[2*i]:
             qc.x(router_left[start_index - offset + i])
         qc.reset(router_right[start_index - offset + i])
-        with qc.if_test((store_val[2*i], 1)):
+        if store_val[2*i+1]:
             qc.x(router_right[start_index - offset + i])
 
 def load_layer(num_levels: int, queries: list[dict[str, Any]], qc: QuantumCircuit, registers: dict[str, Register]) -> list[dict[str, Any]]:
@@ -74,10 +74,12 @@ def load_layer(num_levels: int, queries: list[dict[str, Any]], qc: QuantumCircui
         for i in range(max(1, q['loaded'] - num_levels), q['s'] + 1):
             for j in range(0, 2**i):
                 dest = 2**i - 1 + j
-                source = tree_start + dest // 2
+                source = tree_start + (dest-1) // 2
                 dest += tree_start
-                transport(qc, registers['router_left'][source], registers['router_input'][dest])
-                transport(qc, registers['router_right'][source], registers['router_input'][dest + 1])
+                if j % 2 == 0:
+                    transport(qc, registers['router_left'][source], registers['router_input'][dest])
+                else:
+                    transport(qc, registers['router_right'][source], registers['router_input'][dest])
         if q['loaded'] < num_levels:
             load(qc, registers['router_input'][tree_start], registers['addr_in_bus'][q['loaded']])
         elif q['loaded'] == num_levels:
@@ -101,10 +103,12 @@ def load_layer(num_levels: int, queries: list[dict[str, Any]], qc: QuantumCircui
         for i in range(max(1, q['loaded'] - num_levels), q['s'] + 1):
             for j in range(0, 2**i):
                 dest = 2**i - 1 + j
-                source = tree_start + dest // 2
+                source = tree_start + (dest-1) // 2
                 dest += tree_start
-                transport(qc, registers['router_left'][source], registers['router_input'][dest])
-                transport(qc, registers['router_right'][source], registers['router_input'][dest + 1])
+                if j % 2 == 0:
+                    transport(qc, registers['router_left'][source], registers['router_input'][dest])
+                else:
+                    transport(qc, registers['router_right'][source], registers['router_input'][dest])
         if q['loaded'] < num_levels:
             load(qc, registers['router_input'][tree_start], registers['addr_in_bus'][q['loaded']])
         elif q['loaded'] == num_levels:
@@ -139,15 +143,17 @@ def unload_layer(num_levels: int, queries: list[dict[str, Any]], qc: QuantumCirc
         for i in range(max(1, q['loaded'] - num_levels), q['s'] + 1):
             for j in range(0, 2**i):
                 dest = 2**i - 1 + j
-                source = tree_start + dest // 2
+                source = tree_start + (dest-1) // 2
                 dest += tree_start
-                transport(qc, registers['router_left'][source], registers['router_input'][dest])
-                transport(qc, registers['router_right'][source], registers['router_input'][dest + 1])
-        if 0 < q['loaded'] <= num_levels:
+                if j % 2 == 0:
+                    transport(qc, registers['router_left'][source], registers['router_input'][dest])
+                else:
+                    transport(qc, registers['router_right'][source], registers['router_input'][dest])
+        if q['loaded'] < num_levels:
             load(qc, registers['router_input'][tree_start], registers['addr_out_bus'][q['loaded']])
             qc.reset(registers['router_input'][tree_start])
-        elif q['loaded'] == 0:
-            qc.swap(registers['router_input'][tree_start], registers['data_bus'][0])
+        elif q['loaded'] == num_levels:
+            load(qc, registers['router_input'][tree_start], registers['data_bus'][0])
             qc.reset(registers['router_input'][tree_start])
 
     qc.barrier()
@@ -168,10 +174,12 @@ def unload_layer(num_levels: int, queries: list[dict[str, Any]], qc: QuantumCirc
         for i in range(max(1, q['loaded'] - num_levels), q['s'] + 1):
             for j in range(0, 2**i):
                 dest = 2**i - 1 + j
-                source = tree_start + dest // 2
+                source = tree_start + (dest-1) // 2
                 dest += tree_start
-                transport(qc, registers['router_left'][source], registers['router_input'][dest])
-                transport(qc, registers['router_right'][source], registers['router_input'][dest + 1])
+                if j % 2 == 0:
+                    transport(qc, registers['router_left'][source], registers['router_input'][dest])
+                else:
+                    transport(qc, registers['router_right'][source], registers['router_input'][dest])
         if q['loaded'] < num_levels:
             load(qc, registers['router_input'][tree_start], registers['addr_out_bus'][q['loaded']])
             qc.reset(registers['router_input'][tree_start])
@@ -241,16 +249,24 @@ def schedule_queries(num_levels: int, queries: deque[list[int]], qc: QuantumCirc
         else:
             if t % 4 == 2:
                 swap_i(num_levels, qc, registers)
+                for q in current_queries:
+                    if q['s'] == num_levels:
+                        continue
+                    q['k'] = q['k'] + (1 if q['load'] else -1)
                 if num_levels % 2 == 1:
                     classic_gates(num_levels, qc, registers['router_left'], registers['router_right'], data_bits)
 
             else:
                 swap_ii(num_levels, qc, registers)
+                for q in current_queries:
+                    if q['s'] == num_levels:
+                        continue
+                    q['k'] = q['k'] + (1 if q['load'] else -1)
                 if num_levels % 2 == 0:
                     classic_gates(num_levels, qc, registers['router_left'], registers['router_right'], data_bits)
 
         for q in current_queries:
-            if q['loaded'] > num_levels:
+            if q['s'] == num_levels:
                 q['load'] = False
                 break
 
@@ -264,24 +280,26 @@ if __name__ == "__main__":
 
     queue = deque()
     queue.append([1,2,2,0])
-    queue.append([1,2,2,0])
-    queue.append([1,2,2,0])
-    queue.append([1,2,2,0])
+    # queue.append([1,2,2,0])
+    # queue.append([1,2,2,0])
+    # queue.append([1,2,2,0])
 
     data_bits = [0,0,1,1,0,1,1,0,1,1,1,1,0,0,0,1]
 
     schedule_queries(num_levels, queue, qc, registers, data_bits)
 
-    service = QiskitRuntimeService()
-    backend = service.least_busy(simulator=False, operational=True)
-    pm = generate_preset_pass_manager(backend=backend, optimization_level=1)
-    isa_circuit = pm.run(qc)
+    print(qc.draw())
 
-    sampler = Sampler(mode=backend)
-    job = sampler.run([isa_circuit], shots = 1024)
-
-    primitive_result = job.result()
-    pub_result = primitive_result[0]
-    print(pub_result.data.results.get_counts())
+    # service = QiskitRuntimeService()
+    # backend = service.least_busy(simulator=False, operational=True)
+    # pm = generate_preset_pass_manager(backend=backend, optimization_level=1)
+    # isa_circuit = pm.run(qc)
+    #
+    # sampler = Sampler(mode=backend)
+    # job = sampler.run([isa_circuit], shots = 1024)
+    #
+    # primitive_result = job.result()
+    # pub_result = primitive_result[0]
+    # print(pub_result.data.results.get_counts())
 
 
