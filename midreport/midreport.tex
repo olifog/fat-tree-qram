@@ -83,6 +83,7 @@ We will first validate correctness for small $N$ by comparing BB QRAM outputs ag
 
 Beyond correctness, we will use the generated circuits to extract microarchitectural and algorithm-level metrics and compare them to the analytic formulas in Xu et al.\cite{xu2025fat}. For a range of $N$ we will measure qubit counts, logical circuit depth for single and multiple queries, amortised per-query latency, query parallelism and derived bandwidth / space-time volume, and embed both BB and Fat-Tree QRAM into simple workloads (e.g.\ alternating ``processing'' blocks and QRAM queries, and a small parallel Grover-style search) to compare end-to-end depth and QRAM utilisation. We will then contrast these results with the values and trends reported in Tables 1 and 2 and the figures of Xu et al.\cite{xu2025fat}, and analyse any discrepancies in terms of gate decompositions, layer-counting conventions, and simplifications in our simulator (such as treating all layers as equal cost). Using gate-type counts from our circuits and the error model of Xu et al.\ Sec.\ 8.1, we will also verify that our implementation reproduces the predicted $O(\epsilon \log^2 N)$ infidelity scaling for both architectures.
 
+Finally, we also aim to evaluate how well-suited this architecture is to different quantum platforms (superconducting, trapped ion \& neutral atom). For example, neutral atom qubits allow us to move the qubits physically which will remove much of the cost caused by many long-distance swaps when moving a query to the next router tree in the QRAM.
 
 \printbibliography
 
