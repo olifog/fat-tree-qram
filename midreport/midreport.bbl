@@ -1,0 +1,331 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.2 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{none/global//global/global}
+    \entry{xu2025fat}{inproceedings}{}
+      \true{moreauthor}
+      \true{morelabelname}
+      \name{author}{1}{}{%
+        {{hash=4c951508c01bf858476cbeff2ade4f32}{%
+           family={Xu},
+           familyi={X\bibinitperiod},
+           given={Sifan},
+           giveni={S\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {ACM}%
+      }
+      \strng{namehash}{fcc69c7b133e58b9a7f54aa2718817f4}
+      \strng{fullhash}{fcc69c7b133e58b9a7f54aa2718817f4}
+      \strng{bibnamehash}{fcc69c7b133e58b9a7f54aa2718817f4}
+      \strng{authorbibnamehash}{fcc69c7b133e58b9a7f54aa2718817f4}
+      \strng{authornamehash}{fcc69c7b133e58b9a7f54aa2718817f4}
+      \strng{authorfullhash}{fcc69c7b133e58b9a7f54aa2718817f4}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the 2025 ACM International Conference on Architectural Support for Programming Languages and Operating Systems (ASPLOS)}
+      \field{title}{Fat-Tree QRAM: A High-Bandwidth Shared Quantum Random Access Memory for Parallel Queries}
+      \field{year}{2025}
+    \endentry
+    \entry{giovannetti2008quantum}{article}{}
+      \name{author}{3}{}{%
+        {{hash=66fcb193a88a5437214d71986d88e057}{%
+           family={Giovannetti},
+           familyi={G\bibinitperiod},
+           given={Vittorio},
+           giveni={V\bibinitperiod}}}%
+        {{hash=501c0933970931f080455b29b43e560d}{%
+           family={Lloyd},
+           familyi={L\bibinitperiod},
+           given={Seth},
+           giveni={S\bibinitperiod}}}%
+        {{hash=f37f709832bd576552b54dc18d6a251a}{%
+           family={Maccone},
+           familyi={M\bibinitperiod},
+           given={Lorenzo},
+           giveni={L\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {American Physical Society}%
+      }
+      \strng{namehash}{1e703c613f5bf0ac95e47293a318cefb}
+      \strng{fullhash}{1e703c613f5bf0ac95e47293a318cefb}
+      \strng{bibnamehash}{1e703c613f5bf0ac95e47293a318cefb}
+      \strng{authorbibnamehash}{1e703c613f5bf0ac95e47293a318cefb}
+      \strng{authornamehash}{1e703c613f5bf0ac95e47293a318cefb}
+      \strng{authorfullhash}{1e703c613f5bf0ac95e47293a318cefb}
+      \field{extraname}{1}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Physical Review Letters}
+      \field{number}{16}
+      \field{title}{Quantum random access memory}
+      \field{volume}{100}
+      \field{year}{2008}
+      \field{pages}{160501}
+      \range{pages}{1}
+    \endentry
+    \entry{grover1996search}{inproceedings}{}
+      \name{author}{1}{}{%
+        {{hash=619ef89ee12058aba6b0df9b17b11ca3}{%
+           family={Grover},
+           familyi={G\bibinitperiod},
+           given={Lov\bibnamedelima K.},
+           giveni={L\bibinitperiod\bibinitdelim K\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {ACM}%
+      }
+      \strng{namehash}{619ef89ee12058aba6b0df9b17b11ca3}
+      \strng{fullhash}{619ef89ee12058aba6b0df9b17b11ca3}
+      \strng{bibnamehash}{619ef89ee12058aba6b0df9b17b11ca3}
+      \strng{authorbibnamehash}{619ef89ee12058aba6b0df9b17b11ca3}
+      \strng{authornamehash}{619ef89ee12058aba6b0df9b17b11ca3}
+      \strng{authorfullhash}{619ef89ee12058aba6b0df9b17b11ca3}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the 28th Annual ACM Symposium on Theory of Computing}
+      \field{title}{A fast quantum mechanical algorithm for database search}
+      \field{year}{1996}
+      \field{pages}{212\bibrangedash 219}
+      \range{pages}{8}
+    \endentry
+    \entry{harrow2009quantum}{article}{}
+      \name{author}{3}{}{%
+        {{hash=6bc7275eb8de2a3404fd3f07e6c21a2a}{%
+           family={Harrow},
+           familyi={H\bibinitperiod},
+           given={Aram\bibnamedelima W.},
+           giveni={A\bibinitperiod\bibinitdelim W\bibinitperiod}}}%
+        {{hash=3765d849007f662dc14f33a696aa6a7b}{%
+           family={Hassidim},
+           familyi={H\bibinitperiod},
+           given={Avinatan},
+           giveni={A\bibinitperiod}}}%
+        {{hash=501c0933970931f080455b29b43e560d}{%
+           family={Lloyd},
+           familyi={L\bibinitperiod},
+           given={Seth},
+           giveni={S\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {American Physical Society}%
+      }
+      \strng{namehash}{3b3176c8c71f2d0502e9279289094069}
+      \strng{fullhash}{3b3176c8c71f2d0502e9279289094069}
+      \strng{bibnamehash}{3b3176c8c71f2d0502e9279289094069}
+      \strng{authorbibnamehash}{3b3176c8c71f2d0502e9279289094069}
+      \strng{authornamehash}{3b3176c8c71f2d0502e9279289094069}
+      \strng{authorfullhash}{3b3176c8c71f2d0502e9279289094069}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Physical Review Letters}
+      \field{number}{15}
+      \field{title}{Quantum algorithm for linear systems of equations}
+      \field{volume}{103}
+      \field{year}{2009}
+      \field{pages}{150502}
+      \range{pages}{1}
+    \endentry
+    \entry{low2019hamiltonian}{article}{}
+      \name{author}{2}{}{%
+        {{hash=9392ec6c19f799fdccb939e713e413f0}{%
+           family={Low},
+           familyi={L\bibinitperiod},
+           given={Guang\bibnamedelima Hao},
+           giveni={G\bibinitperiod\bibinitdelim H\bibinitperiod}}}%
+        {{hash=415ddff2f58b25977b1a2dedf18f4501}{%
+           family={Chuang},
+           familyi={C\bibinitperiod},
+           given={Isaac\bibnamedelima L.},
+           giveni={I\bibinitperiod\bibinitdelim L\bibinitperiod}}}%
+      }
+      \strng{namehash}{b0668d01a9717293576ae2686f7b0b6b}
+      \strng{fullhash}{b0668d01a9717293576ae2686f7b0b6b}
+      \strng{bibnamehash}{b0668d01a9717293576ae2686f7b0b6b}
+      \strng{authorbibnamehash}{b0668d01a9717293576ae2686f7b0b6b}
+      \strng{authornamehash}{b0668d01a9717293576ae2686f7b0b6b}
+      \strng{authorfullhash}{b0668d01a9717293576ae2686f7b0b6b}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Quantum}
+      \field{title}{Hamiltonian simulation by qubitization}
+      \field{volume}{3}
+      \field{year}{2019}
+      \field{pages}{163}
+      \range{pages}{1}
+    \endentry
+    \entry{biamonte2017quantum}{article}{}
+      \name{author}{6}{}{%
+        {{hash=392818d7b034b0b53362804f322ab7a5}{%
+           family={Biamonte},
+           familyi={B\bibinitperiod},
+           given={Jacob},
+           giveni={J\bibinitperiod}}}%
+        {{hash=f5a146c5713dd2c5d0bae5d5b944d722}{%
+           family={Wittek},
+           familyi={W\bibinitperiod},
+           given={Peter},
+           giveni={P\bibinitperiod}}}%
+        {{hash=b7f7b29051f4774bb6f5496c8bde3137}{%
+           family={Pancotti},
+           familyi={P\bibinitperiod},
+           given={Nicola},
+           giveni={N\bibinitperiod}}}%
+        {{hash=a16ddc4e1334ba284e93d2d9662ed1c3}{%
+           family={Rebentrost},
+           familyi={R\bibinitperiod},
+           given={Patrick},
+           giveni={P\bibinitperiod}}}%
+        {{hash=9906b78ec80183f9ac5008ae54ce7088}{%
+           family={Wiebe},
+           familyi={W\bibinitperiod},
+           given={Nathan},
+           giveni={N\bibinitperiod}}}%
+        {{hash=501c0933970931f080455b29b43e560d}{%
+           family={Lloyd},
+           familyi={L\bibinitperiod},
+           given={Seth},
+           giveni={S\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Nature Publishing Group}%
+      }
+      \strng{namehash}{de65f18da53209f6400cff1efb92e03a}
+      \strng{fullhash}{031ed5130f34284243a48743ae52d3e4}
+      \strng{bibnamehash}{de65f18da53209f6400cff1efb92e03a}
+      \strng{authorbibnamehash}{de65f18da53209f6400cff1efb92e03a}
+      \strng{authornamehash}{de65f18da53209f6400cff1efb92e03a}
+      \strng{authorfullhash}{031ed5130f34284243a48743ae52d3e4}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Nature}
+      \field{number}{7671}
+      \field{title}{Quantum machine learning}
+      \field{volume}{549}
+      \field{year}{2017}
+      \field{pages}{195\bibrangedash 202}
+      \range{pages}{8}
+    \endentry
+    \entry{giovannetti2008architectures}{article}{}
+      \name{author}{3}{}{%
+        {{hash=66fcb193a88a5437214d71986d88e057}{%
+           family={Giovannetti},
+           familyi={G\bibinitperiod},
+           given={Vittorio},
+           giveni={V\bibinitperiod}}}%
+        {{hash=501c0933970931f080455b29b43e560d}{%
+           family={Lloyd},
+           familyi={L\bibinitperiod},
+           given={Seth},
+           giveni={S\bibinitperiod}}}%
+        {{hash=f37f709832bd576552b54dc18d6a251a}{%
+           family={Maccone},
+           familyi={M\bibinitperiod},
+           given={Lorenzo},
+           giveni={L\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {American Physical Society}%
+      }
+      \strng{namehash}{1e703c613f5bf0ac95e47293a318cefb}
+      \strng{fullhash}{1e703c613f5bf0ac95e47293a318cefb}
+      \strng{bibnamehash}{1e703c613f5bf0ac95e47293a318cefb}
+      \strng{authorbibnamehash}{1e703c613f5bf0ac95e47293a318cefb}
+      \strng{authornamehash}{1e703c613f5bf0ac95e47293a318cefb}
+      \strng{authorfullhash}{1e703c613f5bf0ac95e47293a318cefb}
+      \field{extraname}{2}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Physical Review A}
+      \field{number}{5}
+      \field{title}{Architectures for a quantum random access memory}
+      \field{volume}{78}
+      \field{year}{2008}
+      \field{pages}{052310}
+      \range{pages}{1}
+    \endentry
+    \entry{arunachalam2015robustness}{article}{}
+      \name{author}{5}{}{%
+        {{hash=869b785ae3fff798e8635b5347b7420d}{%
+           family={Arunachalam},
+           familyi={A\bibinitperiod},
+           given={Srinivasan},
+           giveni={S\bibinitperiod}}}%
+        {{hash=f839f23456b3fda89802a23cf43ab629}{%
+           family={Gheorghiu},
+           familyi={G\bibinitperiod},
+           given={Vlad},
+           giveni={V\bibinitperiod}}}%
+        {{hash=58048b256b7456bf2489552e28295663}{%
+           family={Jochym-O'Connor},
+           familyi={J\bibinithyphendelim O\bibinitperiod},
+           given={Tomas},
+           giveni={T\bibinitperiod}}}%
+        {{hash=cac498e264a2fdb0a8c4dd3e95c92055}{%
+           family={Mosca},
+           familyi={M\bibinitperiod},
+           given={Michele},
+           giveni={M\bibinitperiod}}}%
+        {{hash=8115cf9559d0bfee20865a7f3d93008a}{%
+           family={Srinivasan},
+           familyi={S\bibinitperiod},
+           given={Priyanka\bibnamedelima Varshinee},
+           giveni={P\bibinitperiod\bibinitdelim V\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {IOP Publishing}%
+      }
+      \strng{namehash}{6f298d96b5d55322a74b46c69e5fed89}
+      \strng{fullhash}{4da87ddd83401f87b4070d7b6fecb896}
+      \strng{bibnamehash}{6f298d96b5d55322a74b46c69e5fed89}
+      \strng{authorbibnamehash}{6f298d96b5d55322a74b46c69e5fed89}
+      \strng{authornamehash}{6f298d96b5d55322a74b46c69e5fed89}
+      \strng{authorfullhash}{4da87ddd83401f87b4070d7b6fecb896}
+      \field{sortinit}{8}
+      \field{sortinithash}{a231b008ebf0ecbe0b4d96dcc159445f}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{New Journal of Physics}
+      \field{number}{12}
+      \field{title}{On the robustness of bucket brigade quantum RAM}
+      \field{volume}{17}
+      \field{year}{2015}
+      \field{pages}{123010}
+      \range{pages}{1}
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+
