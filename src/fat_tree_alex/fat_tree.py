@@ -7,6 +7,7 @@ import math
 
 from qiskit.circuit import Qubit, Register
 
+
 def create_qram(qram_size: int, num_queries: int) -> tuple[QuantumCircuit, dict[str, Register]]:
     addr_length = int(math.ceil(math.log(qram_size, 2)))
 
@@ -18,7 +19,8 @@ def create_qram(qram_size: int, num_queries: int) -> tuple[QuantumCircuit, dict[
 
     registers['addr_in_bus'] = QuantumRegister(addr_length, name='addr_in')
     registers['addr_out_bus'] = QuantumRegister(addr_length, name='addr_out')
-    registers['data_bus'] = QuantumRegister(1, name='data')
+    registers['data_in_bus'] = QuantumRegister(1, name='data_in')
+    registers['data_out_bus'] = QuantumRegister(1, name='data_out')
     registers['router_input'] = QuantumRegister(num_routers, name='input')
     registers['router_route_qubit'] = QuantumRegister(num_routers, name='route')
     registers['router_left'] = QuantumRegister(num_routers, name='left')
@@ -28,7 +30,8 @@ def create_qram(qram_size: int, num_queries: int) -> tuple[QuantumCircuit, dict[
     qc = QuantumCircuit(
         registers['addr_in_bus'],
         registers['addr_out_bus'],
-        registers['data_bus'],
+        registers['data_in_bus'],
+        registers['data_out_bus'],
         registers['router_input'],
         registers['router_route_qubit'],
         registers['router_left'],
@@ -83,7 +86,7 @@ def load_layer(num_levels: int, queries: list[dict[str, Any]], qc: QuantumCircui
         if q['loaded'] < num_levels:
             load(qc, registers['router_input'][tree_start], registers['addr_in_bus'][q['loaded']])
         elif q['loaded'] == num_levels:
-            load(qc, registers['router_input'][tree_start], registers['data_bus'][0])
+            load(qc, registers['router_input'][tree_start], registers['data_in_bus'][0])
         q['loaded'] += 1
 
     qc.barrier()
@@ -112,7 +115,7 @@ def load_layer(num_levels: int, queries: list[dict[str, Any]], qc: QuantumCircui
         if q['loaded'] < num_levels:
             load(qc, registers['router_input'][tree_start], registers['addr_in_bus'][q['loaded']])
         elif q['loaded'] == num_levels:
-            load(qc, registers['router_input'][tree_start], registers['data_bus'][0])
+            load(qc, registers['router_input'][tree_start], registers['data_in_bus'][0])
         q['loaded'] += 1
 
     qc.barrier()
@@ -150,11 +153,10 @@ def unload_layer(num_levels: int, queries: list[dict[str, Any]], qc: QuantumCirc
                 else:
                     transport(qc, registers['router_right'][source], registers['router_input'][dest])
         if q['loaded'] < num_levels:
+            qc.reset(registers['addr_out_bus'][q['loaded']])
             load(qc, registers['router_input'][tree_start], registers['addr_out_bus'][q['loaded']])
-            qc.reset(registers['router_input'][tree_start])
         elif q['loaded'] == num_levels:
-            load(qc, registers['router_input'][tree_start], registers['data_bus'][0])
-            qc.reset(registers['router_input'][tree_start])
+            load(qc, registers['router_input'][tree_start], registers['data_out_bus'][0])
 
     qc.barrier()
     for q in queries:
@@ -181,11 +183,10 @@ def unload_layer(num_levels: int, queries: list[dict[str, Any]], qc: QuantumCirc
                 else:
                     transport(qc, registers['router_right'][source], registers['router_input'][dest])
         if q['loaded'] < num_levels:
+            qc.reset(registers['addr_out_bus'][q['loaded']])
             load(qc, registers['router_input'][tree_start], registers['addr_out_bus'][q['loaded']])
-            qc.reset(registers['router_input'][tree_start])
         elif q['loaded'] == num_levels:
-            load(qc, registers['router_input'][tree_start], registers['data_bus'][0])
-            qc.reset(registers['router_input'][tree_start])
+            load(qc, registers['router_input'][tree_start], registers['data_out_bus'][0])
 
     qc.barrier()
     return queries
@@ -220,7 +221,7 @@ def schedule_queries(num_levels: int, queries: deque[list[int]], qc: QuantumCirc
     t = 1
     while current_queries or queries:
         if t % 2 == 1:
-            if queries:
+            if t % 4 == 1 and queries:
                 query_bits = queries.popleft()
                 next_query = {'load': True, 'bits': query_bits, 'bit_ptr': 0, 'loaded': 0, 'k': 0, 's': 0}
                 current_queries.append(next_query)
@@ -241,9 +242,9 @@ def schedule_queries(num_levels: int, queries: deque[list[int]], qc: QuantumCirc
             unload_layer(num_levels, unload_queries, qc, registers)
 
             if current_queries[0]['loaded'] == 0:
-                qc.measure(registers['data_bus'][0], registers['results'][result_index])
+                qc.measure(registers['data_out_bus'][0], registers['results'][result_index])
                 result_index += 1
-                qc.reset(registers['data_bus'][0])
+                qc.reset(registers['data_out_bus'][0])
                 del current_queries[0]
 
         else:
@@ -274,17 +275,19 @@ def schedule_queries(num_levels: int, queries: deque[list[int]], qc: QuantumCirc
 
 
 if __name__ == "__main__":
-    num_levels = 4
-    num_queries = 1
+    num_levels = 3
+    num_queries = 3
     qc, registers = create_qram(2**num_levels, num_queries)
 
     queue = deque()
-    queue.append([1,1,0,0])
+    queue.append([1,1,0])
+    queue.append([1,1,0])
+    queue.append([1,1,0])
     # queue.append([1,2,2,0])
     # queue.append([1,2,2,0])
     # queue.append([1,2,2,0])
 
-    data_bits = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+    data_bits = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1] * 2
 
     schedule_queries(num_levels, queue, qc, registers, data_bits)
 
