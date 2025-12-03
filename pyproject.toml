@@ -15,8 +15,8 @@ dependencies = [
 ]
 
 [project.scripts]
-qram = "qram:main"
-fat-tree-alex = "fat_tree_alex:fat_tree"
+qram = "qram.fat_tree_qram:main"
+fat-tree-alex = "fat_tree_alex.fat_tree:main"
 
 [build-system]
 requires = ["hatchling"]

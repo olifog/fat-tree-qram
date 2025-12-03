@@ -274,20 +274,17 @@ def schedule_queries(num_levels: int, queries: deque[list[int]], qc: QuantumCirc
         t = (t + 1) % 4
 
 
-if __name__ == "__main__":
-    num_levels = 3
+def main():
+    num_levels = 2
     num_queries = 3
     qc, registers = create_qram(2**num_levels, num_queries)
 
     queue = deque()
-    queue.append([1,1,0])
-    queue.append([1,1,0])
-    queue.append([1,1,0])
-    # queue.append([1,2,2,0])
-    # queue.append([1,2,2,0])
-    # queue.append([1,2,2,0])
+    queue.append([1, 1])
+    queue.append([1, 1])
+    queue.append([1, 1])
 
-    data_bits = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1] * 2
+    data_bits = [1, 1, 1, 1]
 
     schedule_queries(num_levels, queue, qc, registers, data_bits)
 
@@ -299,10 +296,14 @@ if __name__ == "__main__":
     isa_circuit = pm.run(qc)
 
     sampler = Sampler(mode=backend)
-    job = sampler.run([isa_circuit], shots = 1024)
+    job = sampler.run([isa_circuit], shots=1024)
 
     primitive_result = job.result()
     pub_result = primitive_result[0]
     print(pub_result.data.results.get_counts())
+
+
+if __name__ == "__main__":
+    main()
 
 

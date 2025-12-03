@@ -263,45 +263,41 @@ def create_fat_tree_qram(n: int) -> FatTreeQRAM:
     return FatTreeQRAM(n)
 
 
+def main():
+    from collections import deque
+    from qiskit.transpiler import generate_preset_pass_manager
+    from qiskit_ibm_runtime import QiskitRuntimeService, SamplerV2 as Sampler
+    from .scheduler import FatTreeScheduler
+
+    num_levels = 2
+    num_queries = 3
+    qram = FatTreeQRAM(num_levels)
+    qc, regs = qram.create_circuit(num_queries=num_queries)
+
+    queue = deque()
+    queue.append([1, 1])
+    queue.append([1, 1])
+    queue.append([1, 1])
+
+    data_bits = [1, 1, 1, 1]
+
+    scheduler = FatTreeScheduler(qram)
+    scheduler.schedule_queries(qc, regs, list(queue), data_bits)
+
+    print(qc.draw())
+
+    service = QiskitRuntimeService()
+    backend = service.least_busy(simulator=False, operational=True)
+    pm = generate_preset_pass_manager(backend=backend, optimization_level=1)
+    isa_circuit = pm.run(qc)
+
+    sampler = Sampler(mode=backend)
+    job = sampler.run([isa_circuit], shots=1024)
+
+    primitive_result = job.result()
+    pub_result = primitive_result[0]
+    print(pub_result.data.result.get_counts())
+
+
 if __name__ == "__main__":
-    from qiskit_aer import AerSimulator
-
-    n = 2
-    N = 2 ** n
-    data = [0, 1, 1, 0]
-
-    print("=" * 60)
-    print(f"Fat-Tree QRAM Demo - n={n}, N={N} addresses")
-    print("=" * 60)
-    print(f"\nData stored: {data}")
-
-    qram = FatTreeQRAM(n)
-    print(f"Number of routers: {qram.num_routers}")
-
-    simulator = AerSimulator()
-
-    print("\nQuerying addresses:")
-
-    for addr in range(N):
-        circuit, _ = qram.query_classical_address(addr, data)
-        result = simulator.run(circuit, shots=1000).result()
-        counts = result.get_counts()
-
-        measured_0 = sum(count for bits, count in counts.items() if bits[-1] == '0')
-        measured_1 = sum(count for bits, count in counts.items() if bits[-1] == '1')
-
-        expected = data[addr]
-        correct = measured_1 if expected == 1 else measured_0
-
-        print(f"  Address {addr}: expected={expected}, measured 0={measured_0} 1={measured_1}, "
-              f"correct={correct/10:.1f}%")
-
-    print("\nCircuit statistics (for address 0):")
-    circuit, _ = qram.query_classical_address(0, data)
-    print(f"  Total qubits: {circuit.num_qubits}")
-    print(f"  Circuit depth: {circuit.depth()}")
-    print(f"  Gate count: {sum(circuit.count_ops().values())}")
-
-    print("\n" + "=" * 60)
-    print("Demo complete!")
-    print("=" * 60)
+    main()
