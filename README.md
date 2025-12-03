@@ -4,14 +4,6 @@ Implementation of quantum RAM architectures based on [arXiv:2502.06767](https://
 
 ## Usage
 
-### Run BB QRAM Demo
-
-```bash
-uv run bb
-```
-
-This demonstrates an 8-address QRAM querying multiple addresses with 100% accuracy.
-
 ### Run Tests
 
 ```bash
