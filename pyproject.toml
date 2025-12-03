@@ -17,6 +17,7 @@ dependencies = [
 [project.scripts]
 qram = "qram.fat_tree_qram:main"
 fat-tree-alex = "fat_tree_alex.fat_tree:main"
+bb-qram = "qram.bb_qram:main"
 
 [build-system]
 requires = ["hatchling"]
@@ -36,5 +37,5 @@ dev = [
 ignore_missing_imports = false
 
 [[tool.mypy.overrides]]
-module = ["qiskit.*", "qiskit_aer.*"]
+module = ["qiskit.*", "qiskit_aer.*", "qiskit_ibm_runtime.*"]
 ignore_missing_imports = true

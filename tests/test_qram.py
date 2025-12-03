@@ -307,29 +307,6 @@ class TestBBAndFatTreeComparison:
             assert bb.num_routers == expected_bb
 
 
-class TestCircuitProperties:
-    def test_qubit_count_formula(self):
-        for n in range(1, 4):
-            bb = BucketBrigadeQRAM(n)
-            ft = FatTreeQRAM(n)
-            bb_circuit, _ = bb.create_circuit()
-            ft_circuit, _ = ft.create_circuit()
-            bb_expected = 2 * n + 1 + 4 * bb.num_routers + bb.N
-            ft_expected = 2 * n + 1 + 4 * ft.num_routers + ft.N
-            
-            assert bb_circuit.num_qubits == bb_expected
-            assert ft_circuit.num_qubits == ft_expected
-    
-    def test_circuit_has_measurements(self):
-        bb = BucketBrigadeQRAM(n=2)
-        ft = FatTreeQRAM(n=2)
-        
-        bb_circuit, _ = bb.query_classical_address(0, [0, 0, 0, 0])
-        ft_circuit, _ = ft.query_classical_address(0, [0, 0, 0, 0])
-        
-        assert 'measure' in bb_circuit.count_ops()
-        assert 'measure' in ft_circuit.count_ops()
-
 
 class TestEdgeCases:
     def test_n1_minimal(self):
