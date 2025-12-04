@@ -307,14 +307,14 @@ def main():
     from qiskit.transpiler import generate_preset_pass_manager
     from qiskit_ibm_runtime import QiskitRuntimeService, SamplerV2 as Sampler
 
-    num_levels = 4
+    num_levels = 2
     num_queries = 1
 
     qram = FatTreeQRAM(num_levels)
     qc, regs = qram.create_circuit(num_queries)
 
-    queries = [[1,1,1,1]]
-    data_bits = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 1]
+    queries = [[1,1]]
+    data_bits = [0,0,0, 1]
 
     scheduler = FatTreeScheduler(qram)
     scheduler.schedule_queries(qc, regs, queries, data_bits)

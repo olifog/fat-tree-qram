@@ -224,7 +224,9 @@ the additional number of swap gates per round is $4\cdot(2^n-n-1)$.
 For a size-$n$ Fat-Tree, a query completes in $n$ rounds, so when pipelining $m$ queries,
 we have an additional $(m+n-1)\cdot 4\cdot (2^n-n-1)$ SWAP gates required.
 One query in a BB QRAM requires $2\cdot(n+1)\cdot (n+2)+2\cdot n$ gates total and so the 
-additional swap gates represent an increase of approximately $\frac{2^n}{n}$.
+additional swap gates over $m$ queries gives
+$O(\frac{2^n}{n\cdot m})$ as the ratio between the added swap gates and the gates that 
+were present before.
 
 This SWAP overhead is further compounded on superconducting hardware, where limited connectivity means multiple physical swaps may be required for each logical swap.
 This, however, can be mitigated on alternative platforms.
