@@ -1,0 +1,211 @@
+
+\documentclass[10pt,twocolumn]{article}
+
+\usepackage[margin=0.75in]{geometry}
+\usepackage{hyperref}
+\usepackage[sorting=none]{biblatex}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{braket}
+\usepackage{graphicx}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{listings}
+
+\addbibresource{references.bib}
+
+\title{\textbf{Reproducing and Validating Fat-Tree QRAM:\\A High-Bandwidth Shared Quantum Memory Architecture}}
+\date{}
+\author{Alex Newsham (amn57), Oliver Fogelin (of284)}
+
+\begin{document}
+
+\maketitle
+
+%=============================================================================
+% SECTION 1: INTRODUCTION
+%=============================================================================
+\section{Introduction}
+
+Quantum Random Access Memory (QRAM) is a critical primitive for quantum computing, enabling algorithms to query classical databases in superposition \cite{giovannetti2008quantum}. Many important algorithms---including Grover search \cite{grover1996search}, HHL for solving linear systems \cite{harrow2009quantum}, Hamiltonian simulation \cite{low2019hamiltonian}, and quantum machine learning schemes \cite{biamonte2017quantum}---assume QRAM as an ideal primitive and measure complexity only in terms of query count.
+
+The prevailing architecture for QRAM is bucket-brigade (BB) QRAM \cite{giovannetti2008quantum,giovannetti2008architectures}, which uses a binary tree of quantum routers to achieve $O(\log N)$ query latency for a database of size $N$ using $O(N)$ qubits. However, BB QRAM has a significant limitation in shared-memory settings: a single query occupies all routers from root to leaves, forcing concurrent queries to serialize. For $p$ clients, effective latency grows to $O(p \log N)$, making QRAM a bandwidth bottleneck for parallel quantum workloads.
+
+Fat-Tree QRAM, proposed by Xu et al.\ \cite{xu2025fat}, addresses this limitation by enabling query-level parallelism while retaining BB's space and error scaling. The architecture duplicates routers along an additional index and interleaves controlled-SWAP operations with SWAP layers according to a scheduling protocol. This allows up to $O(\log N)$ concurrent queries to coexist in different slices of the structure, achieving $O(\log N)$ total latency for $O(\log N)$ queries---giving bandwidth that is asymptotically independent of $N$.
+
+In this work, we reproduce and validate the core claims of Fat-Tree QRAM at the circuit level. Our contributions are:
+\begin{enumerate}
+    \item A Qiskit-based implementation of both BB and Fat-Tree QRAM architectures.
+    \item An implementation of Algorithm 1 from Xu et al., the query scheduling protocol that enables pipelined execution.
+    \item Validation of correctness via quantum simulation, comparing pipelined multi-query behaviour against sequential execution.
+    \item Verification of resource scaling claims, measuring qubit counts, circuit depth, and gate counts as functions of $N$.
+\end{enumerate}
+
+\textcolor{red}{\textbf{ALEX: INSERT BRIEF SUMMARY OF RESULTS HERE PLS MAYBE}}
+
+%=============================================================================
+% SECTION 2: BACKGROUND (~1 page)
+%=============================================================================
+\section{Background}
+
+%-----------------------------------------------------------------------------
+\subsection{Quantum Random Access Memory}
+
+A QRAM provides quantum algorithms with the ability to query a classical database of $N$ entries in superposition. Formally, the QRAM query operation is defined as:
+\[
+\sum_{i=0}^{N-1} \alpha_i \ket{i}_A \ket{0}_B \;\longmapsto\; \sum_{i=0}^{N-1} \alpha_i \ket{i}_A \ket{x_i}_B
+\]
+where $\ket{i}_A$ is an $n = \log_2 N$ qubit address register prepared in a superposition with amplitudes $\alpha_i$, $\ket{x_i}_B$ is a bus register that receives the data, and $\{x_i\}_{i=0}^{N-1}$ is the classical database. In this work, we consider a single-qubit bus (i.e., each $x_i \in \{0,1\}$).
+
+The key property of QRAM is that it maintains coherence across the superposition: a query to an address in superposition returns the corresponding data values entangled with each address component. Classical RAM cannot operate on addresses in superposition, returning only a single value per query rather than data entangled with each address component. QRAM thus enables quantum algorithms to access data in ways that exploit quantum parallelism.
+
+%-----------------------------------------------------------------------------
+\subsection{Bucket-Brigade QRAM}
+
+Bucket-brigade (BB) QRAM \cite{giovannetti2008quantum,giovannetti2008architectures} arranges $2^n - 1$ quantum routers in a binary tree structure above the classical memory cells. Figure~\ref{fig:bb-qram}(c) shows this H-tree layout for $N=8$: routers (circles) sit above the data cells $x_0, \ldots, x_7$, with the address and bus qubits entering at the root.
+
+\subsubsection{Router Structure and Operations}
+\label{sec:router-ops}
+
+Each router is modeled as a unit with four logical ports: an \emph{input} port that receives incoming qubits, a \emph{route} register that stores the routing decision, and \emph{left}/\emph{right} output ports connected to child routers. The router operates in one of three states: $\ket{0}$ (route left), $\ket{1}$ (route right), or $\ket{W}$ (wait). The wait state $\ket{W}$ indicates an inactive router that has not yet received an address bit. In our implementation, we encode $\ket{W}$ simply as $\ket{0}$: since all qubits initialize to $\ket{0}$ and the route operation uses controlled-SWAPs, an inactive router with route${}=\ket{0}$ will route any incoming qubit leftward by default. This is correct because qubits only reach a router after address bits have been loaded into all ancestor routers, ensuring proper activation order.
+
+Four primitive operations define router behaviour:
+\begin{itemize}
+    \item \textbf{Load}: Transfer a qubit from an external source (address bus or parent router) into the router's input port. Implemented as a SWAP between the source and input.
+    \item \textbf{Store}: Transfer the qubit from the router's input port into its route register, storing the routing decision. Implemented as a SWAP between input and route.
+    \item \textbf{Route}: Direct an incoming qubit toward the appropriate child based on the stored route bit. If route $= \ket{0}$, CSWAP the input toward the left child; if route $= \ket{1}$, toward the right child. This is implemented as two CSWAPs with an X gate: \texttt{CSWAP(route, input, right); X(route); CSWAP(route, input, left); X(route)}.
+    \item \textbf{Transport}: Move qubits between adjacent routers via SWAP operations, enabling bit-level pipelining.
+\end{itemize}
+
+\subsubsection{Query Execution}
+
+A query proceeds in three phases, illustrated in Figure~\ref{fig:bb-qram}(a) for $N=8$. During \textbf{address loading}, each address bit $a_i$ is loaded into the root and routed down through previously-activated routers to level $i$, where it is stored. Each router at level $i$ stores address bit $a_i$ and uses it to route subsequent qubits left (if $a_i = 0$) or right (if $a_i = 1$), as shown in Figure~\ref{fig:bb-qram}(b). During \textbf{data retrieval}, a bus qubit follows the activated paths to the leaves, where data-controlled X gates flip it according to the classical data values, then returns up the tree. During \textbf{address unloading}, address bits are extracted back out through the root, restoring all routers to $\ket{W}$. For an $n$-bit address, each phase requires $O(n)$ layers, giving $O(\log N)$ total circuit depth.
+
+When the address register is in superposition over multiple addresses, each router at level $i$ enters a superposition of $\ket{0}$ and $\ket{1}$ corresponding to the $i$-th bit of each address component. Crucially, the routing is \emph{coherent}: each branch of the superposition activates only \emph{one} root-to-leaf path, not all possible paths simultaneously. For example, if the address is $\frac{1}{\sqrt{2}}(\ket{010} + \ket{111})$, only two paths are activated (addresses 2 and 7), while all other routers remain in $\ket{W}$.
+
+\subsubsection{Error Scaling}
+
+The coherent routing property is essential for BB QRAM's favourable error scaling \cite{arunachalam2015robustness}. Although the tree contains $O(2^n)$ routers, each amplitude component of a superposition query activates exactly $n$ routers (one per level along a single root-to-leaf path). If each router operation introduces error $\varepsilon$, the total query infidelity scales as $O(\log^2 N \cdot \varepsilon)$, not $O(N \cdot \varepsilon)$. This poly-logarithmic error scaling makes BB QRAM practical for large memories, provided individual router fidelities are sufficiently high.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\columnwidth]{bb_qram_figure.jpg}
+    \caption{Bucket-Brigade QRAM architecture. (a) Query execution for $N=8$ showing circuit layers. (b) A single router using CSWAP operations. (c) H-tree layout with active routers (red) after address loading. Figure reproduced from Xu et al.\ \cite{xu2025fat}.}
+    \label{fig:bb-qram}
+\end{figure}
+
+%-----------------------------------------------------------------------------
+\subsection{Fat-Tree QRAM}
+
+The key limitation of BB QRAM in shared-memory settings is that a single query occupies routers along an entire root-to-leaf path, blocking concurrent access. Fat-Tree QRAM \cite{xu2025fat} overcomes this by \emph{duplicating} routers along a new index $k$, creating a structure where multiple queries can coexist in different ``slices'' of the architecture without conflict.
+
+\subsubsection{Router Duplication and Structure}
+
+Fat-Tree QRAM retains the same binary tree layout as BB QRAM, with $2^i$ nodes at level $i$. However, each node at level $i$ contains $(n-i)$ quantum routers instead of one. Routers are indexed by a 3-tuple $(i, j, k)$: $i \in [0, n-1]$ is the level, $j \in [0, 2^i - 1]$ is the node index, and $k \in [0, n-i-1]$ identifies the router copy within node $(i, j)$. Thus:
+\begin{itemize}
+    \item Level 0 (root): 1 node with $n$ routers
+    \item Level 1: 2 nodes, each with $n-1$ routers
+    \item Level $n-1$ (leaves): $2^{n-1}$ nodes, each with 1 router
+\end{itemize}
+
+Figure~\ref{fig:fat-tree} illustrates this structure for $N=32$. Each internal node contains multiple quantum routers (shown as coloured circles), with the number of routers per node decreasing linearly toward the leaves. The total router count is $\sum_{i=0}^{n-1} (n-i) \cdot 2^i = 2N - 2 - n$, approximately twice BB QRAM's $2^n - 1$ routers.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\columnwidth]{fat_tree_figure.jpg}
+    \caption{Layout of Fat-Tree QRAM with capacity $N=32$. Classical data are located at the leaves and internal nodes contain multiplexed quantum routers. Colours indicate connections between routers across the tree. The number of routers per node increases linearly toward the root. Figure reproduced from Xu et al.\ \cite{xu2025fat}.}
+    \label{fig:fat-tree}
+\end{figure}
+
+\subsubsection{Query Pipelining via SWAP Layers}
+
+The key insight enabling parallelism is that queries at different stages of execution can occupy different $k$-slices simultaneously. Fat-Tree QRAM achieves this through an alternating schedule of \textbf{gate steps} and \textbf{SWAP layers}:
+
+\begin{itemize}
+    \item \textbf{Gate steps}: Perform standard BB QRAM operations (load, route, store) within a fixed $k$-slice. Each query operates on routers at its current $k$-level.
+    \item \textbf{SWAP-I layers}: Exchange router contents between adjacent $k$-levels where $k$ is even (i.e., between $k=0 \leftrightarrow k=1$, $k=2 \leftrightarrow k=3$, etc.).
+    \item \textbf{SWAP-II layers}: Exchange router contents between adjacent $k$-levels where $k$ is odd (i.e., between $k=1 \leftrightarrow k=2$, $k=3 \leftrightarrow k=4$, etc.).
+\end{itemize}
+
+The execution alternates: gate step $\rightarrow$ SWAP-I $\rightarrow$ gate step $\rightarrow$ SWAP-II $\rightarrow$ repeat. This pattern ensures that queries ``move'' through $k$-space as they progress, vacating lower $k$-levels for new incoming queries. A new query can be injected once per four-timestep scheduling cycle, allowing up to $O(n) = O(\log N)$ queries to be in flight simultaneously.
+
+\subsubsection{Parallelism and Bandwidth}
+
+Because queries occupy disjoint $k$-slices at any given time, they do not conflict on router resources. The result is that $O(\log N)$ independent queries complete in $O(\log N)$ total time steps, giving an effective per-query latency of $O(1)$ in the amortized sense. This represents a bandwidth improvement of $O(\log N)$ over BB QRAM, where $p$ queries require $O(p \log N)$ time.
+
+The trade-off is space: Fat-Tree QRAM requires approximately twice as many routers as BB QRAM. However, for shared-memory workloads with high query contention, this modest space overhead is justified by the dramatic improvement in throughput.
+
+%=============================================================================
+% SECTION 3: IMPLEMENTATION (~1 page)
+%=============================================================================
+\section{Implementation}
+
+We implemented both BB QRAM and Fat-Tree QRAM in Python using the Qiskit quantum circuit library. The complete source code is available at \url{https://github.com/olifog/fat-tree-qram}. This section describes the key challenges encountered during implementation and discusses how we translated the paper's abstract descriptions into working circuits.
+
+%-----------------------------------------------------------------------------
+\subsection{Simulation Scalability}
+
+The primary challenge in validating QRAM implementations is simulation scalability. Each router requires four qubits (input, route, left, right), so BB QRAM with $n$-bit addresses requires $4(2^n - 1)$ router qubits plus address and bus registers. Fat-Tree QRAM approximately doubles this, as each node at level $i$ contains $(n-i)$ router copies. For $n=4$ (16 memory cells), Fat-Tree QRAM requires approximately 100 qubits---still challenging for statevector simulation on classical hardware.
+
+This constraint forced us to validate correctness on small instances ($n \leq 3$) where exact simulation is tractable, then verify resource scaling claims by examining circuit structure without full simulation. We also focused testing on specific address patterns (all-zeros, all-ones, alternating) rather than exhaustive enumeration.
+
+%-----------------------------------------------------------------------------
+\subsection{Translating Algorithm 1}
+
+The paper's scheduling algorithm (Algorithm 1) is described abstractly in terms of ``gate steps'' and ``SWAP layers,'' but translating this to concrete Qiskit circuits required resolving several ambiguities:
+
+\textbf{Operation parallelism.} The paper does not explicitly specify which operations within a gate step can execute in parallel. We determined that load/store operations at different tree levels can be parallelized, but route operations must respect data dependencies within each query.
+
+\textbf{Classical data application.} The paper states that classical data is applied when queries reach the leaves, but the exact timing relative to SWAP layers was unclear. We found that correct behaviour requires applying data at the SWAP-I layer when $n$ is odd, and at the SWAP-II layer when $n$ is even, corresponding to when queries physically occupy the $k = n-1$ slice.
+
+\textbf{Address bit reuse.} Since Fat-Tree pipelines multiple queries through shared bus registers, address bits must be reset and reloaded for each new query. The paper's circuit diagrams implied but did not explicitly state this requirement.
+
+%-----------------------------------------------------------------------------
+\subsection{Classical Data Application}
+
+The classical database values $\{x_i\}$ must be applied to the bus qubit when it reaches the leaf level. Each leaf router at node index $j$ has its left port corresponding to data index $2j$ and its right port to data index $2j+1$. The bus qubit, routed to either the left or right port based on the final address bit, picks up the data value via the route operation (which CSWAPs with the appropriate port).
+
+In our BB QRAM implementation, we apply X gates to the leaf router ports twice---once as the bus descends to the leaves and once as it returns. If the data value is 1, the port is flipped; if 0, it remains unchanged. The net effect is an XOR of the data value onto the bus qubit, while the paired X gates cancel out, leaving the router ports in their original state.
+
+For Fat-Tree QRAM, we use a simpler approach: at each SWAP layer when queries occupy the $k = n-1$ slice (which contains the leaf-level routers), we reset the left/right ports of the relevant routers and conditionally apply X gates based on the classical data values. This occurs at SWAP-I layers when $n$ is odd and at SWAP-II layers when $n$ is even.
+
+%-----------------------------------------------------------------------------
+\subsection{Indexing the Fat-Tree Structure}
+
+\textcolor{red}{\textbf{ALEX: could u pls explain the $(k, \text{tree}, \text{level}, \text{node})$ coordinates into 1D array translation pls}}
+
+%=============================================================================
+% SECTION 4: RESULTS
+%=============================================================================
+\section{Results}
+
+%-----------------------------------------------------------------------------
+\subsection{Correctness Validation}
+%-----------------------------------------------------------------------------
+\subsection{Resource Scaling}
+%-----------------------------------------------------------------------------
+\subsection{Parallel Query Performance}
+%-----------------------------------------------------------------------------
+
+%=============================================================================
+% SECTION 5: CONCLUSION
+%=============================================================================
+\section{Conclusion}
+
+our implementation is awesome
+
+% - How well do empirical results match paper's claims?
+% - Where do discrepancies arise (gate counting conventions, etc.)?
+% - Practical implications
+% - How this applies to like quantum architecture in general
+
+%=============================================================================
+% REFERENCES
+%=============================================================================
+\printbibliography
+
+\end{document}

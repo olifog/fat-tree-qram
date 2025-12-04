@@ -1,7 +1,6 @@
 from .core import Router, RouterQubitIndices, RouterTree
 from .bb_qram import BucketBrigadeQRAM, create_bb_qram
-from .fat_tree_qram import FatTreeQRAM, create_fat_tree_qram
-from .scheduler import FatTreeScheduler, create_scheduler
+from .fat_tree import FatTreeQRAM, FatTreeScheduler, create_fat_tree_qram, create_scheduler
 
 __all__ = [
     'Router',
@@ -16,4 +15,3 @@ __all__ = [
 ]
 
 __version__ = '0.1.0'
-
