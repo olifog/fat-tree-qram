@@ -247,10 +247,10 @@ The increased performance for parallel queries was immediately evident when anal
 In this work, we successfully reproduced and validated the Fat-Tree QRAM architecture 
 proposed by Xu et al., demonstrating its ability to support pipelined, high-bandwidth
 quantum memory queries while preserving the correctness guarantees of BB QRAM. Using 
-Qiskit, we implemented both architectures and verified functional equivalence whilst 
-confirming that Fat-Tree QRAM allows multiple concurrent queries to remain in flight 
+Qiskit, we implemented both architectures and verified functional equivalence whilst
+confirming that Fat-Tree QRAM allows multiple concurrent queries to remain in flight
 without conflict. Our resource scaling analysis confirms that this parallelism comes 
-at the cost of fewer than a 2× increase in router qubits and a moderate rise in SWAP 
+at the cost of fewer than a 2 times increase in router qubits and a moderate rise in SWAP 
 overhead—costs that may not be as large a problem on hardware platforms with improved 
 connectivity, such as trapped ions or neutral atoms. Although physical execution on 
 current superconducting QPUs suffers from significant noise-induced degradation,
