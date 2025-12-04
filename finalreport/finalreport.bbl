@@ -336,6 +336,164 @@
       \field{pages}{123010}
       \range{pages}{1}
     \endentry
+    \entry{Landsman_2019}{article}{}
+      \name{author}{8}{}{%
+        {{hash=831cc59da4aa825a101d5e9054e9429b}{%
+           family={Landsman},
+           familyi={L\bibinitperiod},
+           given={K.\bibnamedelimi A.},
+           giveni={K\bibinitperiod\bibinitdelim A\bibinitperiod}}}%
+        {{hash=c84333257e5fef7e25ef4f7a4111077c}{%
+           family={Wu},
+           familyi={W\bibinitperiod},
+           given={Y.},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=af67c795f4c0e047006d13de1a2ec965}{%
+           family={Leung},
+           familyi={L\bibinitperiod},
+           given={P.\bibnamedelimi H.},
+           giveni={P\bibinitperiod\bibinitdelim H\bibinitperiod}}}%
+        {{hash=0ed679239f8db3369f4b6ad8b7f63b26}{%
+           family={Zhu},
+           familyi={Z\bibinitperiod},
+           given={D.},
+           giveni={D\bibinitperiod}}}%
+        {{hash=c32885ccd146962ca0b9d7e4c189134b}{%
+           family={Linke},
+           familyi={L\bibinitperiod},
+           given={N.\bibnamedelimi M.},
+           giveni={N\bibinitperiod\bibinitdelim M\bibinitperiod}}}%
+        {{hash=9c9ea89807efecf2c44b072b54e65b3c}{%
+           family={Brown},
+           familyi={B\bibinitperiod},
+           given={K.\bibnamedelimi R.},
+           giveni={K\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+        {{hash=80905878dc8168b33cf98c0eced05ce9}{%
+           family={Duan},
+           familyi={D\bibinitperiod},
+           given={L.},
+           giveni={L\bibinitperiod}}}%
+        {{hash=74ebfc3b4e582a44afe3631a345d75b2}{%
+           family={Monroe},
+           familyi={M\bibinitperiod},
+           given={C.},
+           giveni={C\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {American Physical Society (APS)}%
+      }
+      \strng{namehash}{666e06c716e4f4bc7843edb0aed80a4e}
+      \strng{fullhash}{2592c171b28ffe246070c888a283e6b9}
+      \strng{bibnamehash}{666e06c716e4f4bc7843edb0aed80a4e}
+      \strng{authorbibnamehash}{666e06c716e4f4bc7843edb0aed80a4e}
+      \strng{authornamehash}{666e06c716e4f4bc7843edb0aed80a4e}
+      \strng{authorfullhash}{2592c171b28ffe246070c888a283e6b9}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{issn}{2469-9934}
+      \field{journaltitle}{Physical Review A}
+      \field{month}{8}
+      \field{number}{2}
+      \field{title}{Two-qubit entangling gates within arbitrarily long chains of trapped ions}
+      \field{volume}{100}
+      \field{year}{2019}
+      \verb{doi}
+      \verb 10.1103/physreva.100.022332
+      \endverb
+    \endentry
+    \entry{Beugnon_2007}{article}{}
+      \name{author}{11}{}{%
+        {{hash=871aa68542c79b793efb51a8f011213c}{%
+           family={Beugnon},
+           familyi={B\bibinitperiod},
+           given={Jérôme},
+           giveni={J\bibinitperiod}}}%
+        {{hash=604ab2a362f4e36ac416755c6247234c}{%
+           family={Tuchendler},
+           familyi={T\bibinitperiod},
+           given={Charles},
+           giveni={C\bibinitperiod}}}%
+        {{hash=32544482329b212e0565f7e462946047}{%
+           family={Marion},
+           familyi={M\bibinitperiod},
+           given={Harold},
+           giveni={H\bibinitperiod}}}%
+        {{hash=80433473c243c63c7998cda577b61d05}{%
+           family={Gaëtan},
+           familyi={G\bibinitperiod},
+           given={Alpha},
+           giveni={A\bibinitperiod}}}%
+        {{hash=18b3486d15ba864bbbd133d7f65e2983}{%
+           family={Miroshnychenko},
+           familyi={M\bibinitperiod},
+           given={Yevhen},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=ddbca3e1b7db9245e390516f3bef2edb}{%
+           family={Sortais},
+           familyi={S\bibinitperiod},
+           given={Yvan\bibnamedelimb R.\bibnamedelimi P.},
+           giveni={Y\bibinitperiod\bibinitdelim R\bibinitperiod\bibinitdelim P\bibinitperiod}}}%
+        {{hash=e613be53d24c999c71d75a3a40715c3f}{%
+           family={Lance},
+           familyi={L\bibinitperiod},
+           given={Andrew\bibnamedelima M.},
+           giveni={A\bibinitperiod\bibinitdelim M\bibinitperiod}}}%
+        {{hash=d52721d99ce391d62e7e5693807772f1}{%
+           family={Jones},
+           familyi={J\bibinitperiod},
+           given={Matthew\bibnamedelimb P.\bibnamedelimi A.},
+           giveni={M\bibinitperiod\bibinitdelim P\bibinitperiod\bibinitdelim A\bibinitperiod}}}%
+        {{hash=021dfb0f91e77b749db447ccee82d667}{%
+           family={Messin},
+           familyi={M\bibinitperiod},
+           given={Gaétan},
+           giveni={G\bibinitperiod}}}%
+        {{hash=f243eee2a4dbf763fb80352db4b92e9d}{%
+           family={Browaeys},
+           familyi={B\bibinitperiod},
+           given={Antoine},
+           giveni={A\bibinitperiod}}}%
+        {{hash=6b317b59d0965ceee038a85e429af05a}{%
+           family={Grangier},
+           familyi={G\bibinitperiod},
+           given={Philippe},
+           giveni={P\bibinitperiod}}}%
+      }
+      \list{publisher}{2}{%
+        {Springer Science}%
+        {Business Media LLC}%
+      }
+      \strng{namehash}{a657da83c8a6bcd0e97147dd08f943a4}
+      \strng{fullhash}{54cd1b2ff21d10bd5a157147358515f4}
+      \strng{bibnamehash}{a657da83c8a6bcd0e97147dd08f943a4}
+      \strng{authorbibnamehash}{a657da83c8a6bcd0e97147dd08f943a4}
+      \strng{authornamehash}{a657da83c8a6bcd0e97147dd08f943a4}
+      \strng{authorfullhash}{54cd1b2ff21d10bd5a157147358515f4}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{issn}{1745-2481}
+      \field{journaltitle}{Nature Physics}
+      \field{month}{8}
+      \field{number}{10}
+      \field{title}{Two-dimensional transport and transfer of a single atomic qubit in optical tweezers}
+      \field{volume}{3}
+      \field{year}{2007}
+      \field{pages}{696\bibrangedash 699}
+      \range{pages}{4}
+      \verb{doi}
+      \verb 10.1038/nphys698
+      \endverb
+      \verb{urlraw}
+      \verb http://dx.doi.org/10.1038/nphys698
+      \endverb
+      \verb{url}
+      \verb http://dx.doi.org/10.1038/nphys698
+      \endverb
+    \endentry
   \enddatalist
 \endrefsection
 \endinput

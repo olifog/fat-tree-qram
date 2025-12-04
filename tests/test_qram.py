@@ -180,7 +180,7 @@ class TestFatTreeScheduler:
         simulator = AerSimulator()
         
         for addr in range(4):
-            address_bits = [(addr >> i) & 1 for i in range(2)]
+            address_bits = [(addr >> (ft.n - 1 - i)) & 1 for i in range(ft.n)]
             qc, regs = ft.create_circuit(num_queries=1)
             scheduler = FatTreeScheduler(ft)
             scheduler.schedule_queries(qc, regs, [address_bits], data, max_steps=50)
@@ -199,7 +199,7 @@ class TestFatTreeScheduler:
         simulator = AerSimulator()
         
         for addr in range(4):
-            address_bits = [(addr >> i) & 1 for i in range(2)]
+            address_bits = [(addr >> (ft.n - 1 - i)) & 1 for i in range(ft.n)]
             qc, regs = ft.create_circuit(num_queries=1)
             scheduler = FatTreeScheduler(ft)
             scheduler.schedule_queries(qc, regs, [address_bits], data, max_steps=50)
