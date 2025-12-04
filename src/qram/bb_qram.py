@@ -203,11 +203,11 @@ def main():
     from qiskit.transpiler import generate_preset_pass_manager
     from qiskit_ibm_runtime import QiskitRuntimeService, SamplerV2 as Sampler
 
-    num_levels = 2
+    num_levels = 4
     qram = BucketBrigadeQRAM(num_levels)
 
-    data_bits = [1, 0, 1, 1]
-    address_bits = [1, 1]
+    data_bits = [0,0,0,0,0,0,0,0, 0, 0, 0, 0, 0, 0,0, 1]
+    address_bits = [1,1,1,1]
 
     qc, regs = qram.create_circuit()
     qram.query(qc, regs, address_bits, data_values=data_bits, measure=True)

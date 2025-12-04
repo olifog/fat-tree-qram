@@ -9,11 +9,11 @@ class FatTreeQRAM:
     def __init__(self, n: int):
         if n < 1:
             raise ValueError("n must be at least 1")
-        
+
         self.n = n
         self.N = 2 ** n
         self.num_routers = sum([(n - i) * (2**i) for i in range(0, n)])
-    
+
     def create_circuit(self, num_queries: int = 1) -> Tuple[QuantumCircuit, Dict[str, Any]]:
         registers: Dict[str, Any] = {}
         registers['addr_in_bus'] = QuantumRegister(self.n, name='addr_in')
@@ -40,7 +40,7 @@ class FatTreeQRAM:
         )
 
         return qc, registers
-    
+
     def classic_gates(self, qc: QuantumCircuit, regs: Dict[str, Any], data_values: List[int]) -> None:
         start_index = sum([2**(j+1) - 1 for j in range(0, self.n)])
         offset = 2**(self.n-1)
@@ -196,49 +196,49 @@ class FatTreeQRAM:
             raise ValueError(f"Address must be in [0, {self.N-1}]")
         if len(data_values) != self.N:
             raise ValueError(f"Expected {self.N} data values, got {len(data_values)}")
-        
+
         qc, regs = self.create_circuit(num_queries=1)
         address_bits = [(address >> (self.n - 1 - i)) & 1 for i in range(self.n)]
-        
+
         scheduler = FatTreeScheduler(self)
         scheduler.schedule_queries(qc, regs, [address_bits], data_values)
-        
+
         return qc, regs
-    
+
     def query_superposition(self, data_values: List[int]) -> Tuple[QuantumCircuit, Dict[str, Any]]:
         if len(data_values) != self.N:
             raise ValueError(f"Expected {self.N} data values, got {len(data_values)}")
-        
+
         qc, regs = self.create_circuit(num_queries=1)
         address_bits = [2] * self.n
-        
+
         scheduler = FatTreeScheduler(self)
         scheduler.schedule_queries(qc, regs, [address_bits], data_values)
-        
+
         return qc, regs
 
 
 class FatTreeScheduler:
     def __init__(self, qram: FatTreeQRAM):
         self.qram = qram
-    
-    def schedule_queries(self, qc: QuantumCircuit, regs: Dict[str, Any], 
+
+    def schedule_queries(self, qc: QuantumCircuit, regs: Dict[str, Any],
                          queries: List[List[int]], data_values: List[int],
                          max_steps: int = 100) -> int:
         if len(data_values) != self.qram.N:
             raise ValueError(f"Expected {self.qram.N} data values, got {len(data_values)}")
-        
+
         queue: deque[List[int]] = deque(queries)
         current_queries: List[Dict[str, Any]] = []
         result_index = 0
         t = 1
         steps = 0
-        
+
         while current_queries or queue:
             steps += 1
             if steps > max_steps:
                 raise RuntimeError(f"Scheduling exceeded {max_steps} steps")
-            
+
             if t % 2 == 1:
                 if t % 4 == 1 and queue:
                     query_bits = queue.popleft()
@@ -291,7 +291,7 @@ class FatTreeScheduler:
                     break
 
             t = (t + 1) % 4
-        
+
         return result_index
 
 
@@ -307,14 +307,14 @@ def main():
     from qiskit.transpiler import generate_preset_pass_manager
     from qiskit_ibm_runtime import QiskitRuntimeService, SamplerV2 as Sampler
 
-    num_levels = 2
-    num_queries = 3
-    
+    num_levels = 4
+    num_queries = 1
+
     qram = FatTreeQRAM(num_levels)
     qc, regs = qram.create_circuit(num_queries)
 
-    queries = [[1, 1], [1, 1], [1, 1]]
-    data_bits = [1, 1, 1, 1]
+    queries = [[1,1,1,1]]
+    data_bits = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 1]
 
     scheduler = FatTreeScheduler(qram)
     scheduler.schedule_queries(qc, regs, queries, data_bits)

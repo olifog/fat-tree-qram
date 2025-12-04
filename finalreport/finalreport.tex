@@ -15,6 +15,7 @@
 \usepackage{booktabs}
 \usepackage{xcolor}
 \usepackage{listings}
+\usepackage{tabularx}
 
 \addbibresource{references.bib}
 
@@ -44,8 +45,6 @@ In this work, we reproduce and validate the core claims of Fat-Tree QRAM at the 
     \item Validation of correctness via quantum simulation, comparing pipelined multi-query behaviour against sequential execution.
     \item Verification of resource scaling claims, measuring qubit counts, circuit depth, and gate counts as functions of $N$.
 \end{enumerate}
-
-\textcolor{red}{\textbf{ALEX: INSERT BRIEF SUMMARY OF RESULTS HERE PLS MAYBE}}
 
 %=============================================================================
 % SECTION 2: BACKGROUND (~1 page)
@@ -153,7 +152,7 @@ Our implementation follows a modular design separating concerns across several c
 
 The \texttt{BucketBrigadeQRAM} class implements standard BB QRAM using the \texttt{RouterTree} abstraction, with methods for address loading, data retrieval, and address unloading that closely follow the three-phase query procedure described in Section~\ref{sec:router-ops}. The \texttt{FatTreeQRAM} class implements the Fat-Tree architecture with its additional router copies indexed by $k$, along with \texttt{swap\_i} and \texttt{swap\_ii} methods for the interleaved SWAP layers. A separate \texttt{FatTreeScheduler} class implements Algorithm 1 from Xu et al., managing the pipelining state machine that tracks each query's progress through the load/unload phases and coordinates SWAP layer timing.
 
-The test suite validates correctness through simulation using Qiskit's \texttt{AerSimulator}, testing both classical address queries and superposition queries for various data patterns. Comparison tests verify that BB and Fat-Tree implementations produce identical results for single queries.
+The test suite validates correctness through simulation using Qiskit's \texttt{Sampler}, testing both classical address queries and superposition queries for various data patterns. Comparison tests verify that BB and Fat-Tree implementations produce identical results for single queries.
 
 %-----------------------------------------------------------------------------
 \subsection{Classical Data Application}
@@ -167,7 +166,14 @@ For Fat-Tree QRAM, we use a cleaner approach: at each SWAP layer when queries oc
 %-----------------------------------------------------------------------------
 \subsection{Indexing the Fat-Tree Structure}
 
-\textcolor{red}{\textbf{ALEX: could u pls explain the $(k, \text{tree}, \text{level}, \text{node})$ coordinates into 1D array translation pls}}
+% \textcolor{red}{\textbf{ALEX: could u pls explain the $(k, \text{tree}, \text{level}, \text{node})$ coordinates into 1D array translation pls}}
+
+To access each qubit in the Fat-Tree QRAM, we first index the Qiskit \texttt{QuantumCircuit} with the name of the role the qubit serves in the structure to access a 1D Qiskit \texttt{QuantumRegister} that will contain all 
+qubits that serve that role; namely, the roles inside the structure are input, route, left \& right.
+We calculate the index of the qubit within this register using the following formula: $(\Sigma_{n=0}^{k-1}2^{n+1}-1)+2^i-1+j$ with $k$ the tree index (with the smallest tree having $k=0$), $i$ the node level \& $j$ the 
+index of the node on that level.
+This results in the nodes being ordered as a left-to-right, top-to-bottom trace of each tree, starting from the smallest.
+As an example, the route qubit for the third node on the second level of the fourth tree would be indexed as \texttt{regs['router\_route\_qubit'][17]}.
 
 %=============================================================================
 % SECTION 4: RESULTS
@@ -176,10 +182,75 @@ For Fat-Tree QRAM, we use a cleaner approach: at each SWAP layer when queries oc
 
 %-----------------------------------------------------------------------------
 \subsection{Correctness Validation}
+
+To verify correctness, we traced the generated circuits for both BB \& Fat-Tree QRAM to 
+ensure that as long as there are no errors from noise, the structure will always deliver 
+the correct result. 
+We then ran tests using the Qiskit Sampler using the IBM Quantum Platform which gave results
+that largely corresponded to the desired output. 
+However, due to the QPU's offered by IBM having a maximum of 156 superconducting qubits, 
+we were unable to build in adequate quantum error correction to mitigate errors and so 
+the quality of the results greatly declined as we increased the size of the QRAMs.
+\begin{tabular}{r|c|c}
+    \textbf{levels}& \textbf{BB} & \textbf{Fat-Tree}\\ 
+    \hline 
+    \hline 
+    1 & 84\% & 82\%\\ 
+    \hline 
+    2 & 47\% & 40\%\\ 
+    \hline
+    3 & 40\% & 32\%\\ 
+    \hline
+    4 & 35\% & 32\%\\
+    \hline
+    \hline
+\end{tabular}\\
+In the testing we had all memory addresses initialised to 0, apart from the last address 
+which was initialised to 1 and it was this last address which we were trying to access.
+As seen in the table above, the resulting probability of for each QRAM to achieve the 
+correct result was largely the same with only a slight drop caused by the increased gates 
+for the Fat-Tree QRAM.
+
 %-----------------------------------------------------------------------------
 \subsection{Resource Scaling}
+
+In terms of logical qubits required to implement the routers for each tree, we found that 
+BB QRAM required $4\cdot (2^{n}-1)$ qubits for a QRAM that is indexed by $n$ address qubits
+and the Fat-Tree QRAM required $4\cdot (\sum_{i=1}^{n}(2^{i}-1))\approx 4\cdot (2^{n+1}-n-2)$ 
+qubits.
+This means that for the Fat-Tree QRAM's benefit of providing an $O(\log n)$ bandwidth 
+improvement over BB QRAM, we require less than twice the amount of qubits to achieve this.
+
+There is also an increase in the gate count as we now require SWAP gates to move queries 
+between different trees in the Fat-Tree QRAM.
+If we define one round to be the time between starting two different queries, we find that 
+the additional number of swap gates per round is $4\cdot(2^n-n-3)$.
+For an $n$ size Fat-Tree, a query completes in $n$ rounds so when pipelining $m$ queries,
+We have an additional $(m+n-1)\cdot 4\cdot (2^n-n-3)$ SWAP gates required.
+One query in a BB QRAM requires $2\cdot(n+1)\cdot (n+2)+2\cdot n$ gates total and so the 
+additional swap gates represent an increase of approximately $\frac{2^n}{n}$.
+
+This problem of increased SWAP gates is further compounded when we think about what they 
+actually represent on a superconducting, with the high distance between qubits (due to 
+there being a large number that need to interact with each other) meaning that multiple 
+swaps will actually be required for each swap present in the abstracted circuit.
+This however, can be mitigated if this approach to QRAM was done on trapped-ion or 
+neutral-atom quantum computers.
+Trapped-ion computers are able to provide all-to-all connectivity inside an ion chain\cite{Landsman_2019} 
+meaning that the each qubits is connected to a larger number of other qubits, so the 
+total physical swap gates required will be less.
+Additionally, in neutral-atom architectures, the qubits can be moved physically to be 
+closer to other qubits, essentially removing the need for swap gates in the qram, with 
+the only gate that the router needs being CSWAP \& inverse CSWAP gates to do the actual routing.
+
 %-----------------------------------------------------------------------------
 \subsection{Parallel Query Performance}
+
+The increased performance for parallel queries was immediately evident when analysing 
+the generated circuits as it was clear that there could now be multiple queries in 
+flight at once within the QRAM.
+
+
 %-----------------------------------------------------------------------------
 
 %=============================================================================
@@ -187,12 +258,18 @@ For Fat-Tree QRAM, we use a cleaner approach: at each SWAP layer when queries oc
 %=============================================================================
 \section{Conclusion}
 
-our implementation is awesome
-
-% - How well do empirical results match paper's claims?
-% - Where do discrepancies arise (gate counting conventions, etc.)?
-% - Practical implications
-% - How this applies to like quantum architecture in general
+In this work, we successfully reproduced and validated the Fat-Tree QRAM architecture 
+proposed by Xu et al., demonstrating its ability to support pipelined, high-bandwidth
+quantum memory queries while preserving the correctness guarantees of BB QRAM. Using 
+Qiskit we implemented both architectures and verified functional equivalence whilst 
+confirming that Fat-Tree QRAM allows multiple concurrent queries to remain in flight 
+without conflict. Our resource scaling analysis confirms that this parallelism comes 
+at the cost of fewer than a 2× increase in router qubits and a moderate rise in SWAP 
+overhead—costs that may not be as large a problem on hardware platforms with improved 
+connectivity, such as trapped ions or neutral atoms. Although physical execution on 
+current superconducting QPUs suffers from a lot of noise-induced degradation,
+our circuit-level analysis supports the theoretical claim that Fat-Tree QRAM achieves an 
+$O(\log N)$ bandwidth improvement over BB QRAM.
 
 %=============================================================================
 % REFERENCES
