@@ -198,7 +198,7 @@ class FatTreeQRAM:
             raise ValueError(f"Expected {self.N} data values, got {len(data_values)}")
         
         qc, regs = self.create_circuit(num_queries=1)
-        address_bits = [(address >> i) & 1 for i in range(self.n)]
+        address_bits = [(address >> (self.n - 1 - i)) & 1 for i in range(self.n)]
         
         scheduler = FatTreeScheduler(self)
         scheduler.schedule_queries(qc, regs, [address_bits], data_values)

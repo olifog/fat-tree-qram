@@ -48,7 +48,7 @@ but there's a catch. when one query is running, it occupies routers along the en
 
 fat-tree qram solves this by adding extra copies of routers. you can see each node now contains multiple routers—the different colors show different "layers." a scheduling protocol lets queries move through these layers as they progress, so they don't block each other.
 
-this means up to o(log n) queries can be in flight simultaneously, completing in o(log n) total time—giving you o(1) amortized latency per query. the trade-off is about n times more routers.
+this means up to o(log n) queries can be in flight simultaneously, completing in o(log n) total time—giving you o(1) amortized latency per query. the trade-off is about 2 times more routers.
 
 ---
 

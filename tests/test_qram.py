@@ -278,6 +278,37 @@ class TestBBAndFatTreeComparison:
             assert ft_correct > 80, f"FT failed at {addr}: {ft_counts}"
 
 
+class TestBitOrdering:
+    def test_bb_asymmetric_data_addr1_only(self):
+        bb = BucketBrigadeQRAM(n=2)
+        data = [0, 1, 0, 0]
+        
+        simulator = AerSimulator()
+        
+        for addr in range(4):
+            circuit, _ = bb.query_classical_address(addr, data)
+            result = simulator.run(circuit, shots=100).result()
+            counts = result.get_counts()
+            
+            expected_bit = str(data[addr])
+            matches = sum(c for bits, c in counts.items() if bits[-1] == expected_bit)
+            assert matches > 80, f"Address {addr}: expected {data[addr]}, got {counts}"
+    
+    def test_ft_asymmetric_data_addr1_only(self):
+        ft = FatTreeQRAM(n=2)
+        data = [0, 1, 0, 0]
+        
+        simulator = AerSimulator()
+        
+        for addr in range(4):
+            circuit, _ = ft.query_classical_address(addr, data)
+            result = simulator.run(circuit, shots=100).result()
+            counts = result.get_counts()
+            
+            expected_bit = str(data[addr])
+            matches = sum(c for bits, c in counts.items() if bits[-1] == expected_bit)
+            assert matches > 80, f"Address {addr}: expected {data[addr]}, got {counts}"
+
 class TestEdgeCases:
     def test_n1_minimal(self):
         bb = BucketBrigadeQRAM(n=1)
