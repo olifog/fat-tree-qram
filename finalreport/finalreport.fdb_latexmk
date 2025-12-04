@@ -1,13 +1,13 @@
 # Fdb version 4
-["biber finalreport"] 1764810649 "finalreport.bcf" "finalreport.bbl" "finalreport" 1764820865 0
+["biber finalreport"] 1764810649 "finalreport.bcf" "finalreport.bbl" "finalreport" 1764822127 0
   "./references.bib" 1764802750 4145 820f2f77278125a04ee457028ba80f96 ""
-  "finalreport.bcf" 1764820865 108053 4622bd60d3b3071f5f42609acfb29e10 "pdflatex"
+  "finalreport.bcf" 1764822127 108053 4622bd60d3b3071f5f42609acfb29e10 "pdflatex"
   (generated)
   "finalreport.bbl"
   "finalreport.blg"
   (rewritten before read)
-["pdflatex"] 1764820864 "/Users/olifog/cam/ii/uqa/fat-tree-qram/finalreport/finalreport.tex" "finalreport.pdf" "finalreport" 1764820865 0
-  "/Users/olifog/cam/ii/uqa/fat-tree-qram/finalreport/finalreport.tex" 1764820864 18650 772785093cd495d9d5423e4420e3530f ""
+["pdflatex"] 1764822126 "/Users/olifog/cam/ii/uqa/fat-tree-qram/finalreport/finalreport.tex" "finalreport.pdf" "finalreport" 1764822127 0
+  "/Users/olifog/cam/ii/uqa/fat-tree-qram/finalreport/finalreport.tex" 1764822126 18370 8ca40bcd60025a4a6f1ae7fe4223d4fa ""
   "/usr/local/texlive/2023/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1136849721 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/local/texlive/2023/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2023/texmf-dist/fonts/tfm/jknappen/ec/tcrm1000.tfm" 1136768653 1536 e07581a4bb3136ece9eeb4c3ffab8233 ""
@@ -138,11 +138,11 @@
   "/usr/local/texlive/2023/texmf.cnf" 1678822455 577 1b2b1af17af2508fb20dd85783af4050 ""
   "bb_qram_figure.jpg" 1764807327 178929 68b046bdd0b41f294ac9165205469e66 ""
   "fat_tree_figure.jpg" 1764808527 238237 330c0e64d8aaaa779f551d599cb121dc ""
-  "finalreport.aux" 1764820865 6781 7db369e73708dbe134867bf004955a0b "pdflatex"
+  "finalreport.aux" 1764822127 6646 d4986e4251562a8a85790314ca4ea3d3 "pdflatex"
   "finalreport.bbl" 1764810651 13097 8c96be3d1ebf0e716fde340b4f4cc167 "biber finalreport"
-  "finalreport.out" 1764820865 3427 5e9bfd08e1f9d7ec483d58e2d985e14e "pdflatex"
-  "finalreport.run.xml" 1764820865 2354 4bc2e212b894b9152fb0e0b39dbd4009 "pdflatex"
-  "finalreport.tex" 1764820864 18650 772785093cd495d9d5423e4420e3530f ""
+  "finalreport.out" 1764822127 3223 b8b9aa08262e03efb5a0ac4cec2300bb "pdflatex"
+  "finalreport.run.xml" 1764822127 2354 4bc2e212b894b9152fb0e0b39dbd4009 "pdflatex"
+  "finalreport.tex" 1764822126 18370 8ca40bcd60025a4a6f1ae7fe4223d4fa ""
   (generated)
   "finalreport.aux"
   "finalreport.bcf"
